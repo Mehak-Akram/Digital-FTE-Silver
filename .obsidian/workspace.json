@@ -4,37 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "8683650d35e0380f",
+        "id": "ac11899525dee96b",
         "type": "tabs",
         "children": [
           {
-            "id": "d0d3ddee08b358f3",
+            "id": "7e721ee150e5acf9",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Welcome.md",
+                "file": "Needs_Action/task-001.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Welcome"
-            }
-          }
-        ]
-      },
-      {
-        "id": "d631b909ec2f65b7",
-        "type": "tabs",
-        "children": [
-          {
-            "id": "65be2a48bb53cf3c",
-            "type": "leaf",
-            "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "title": "task-001"
             }
           }
         ]
@@ -199,8 +183,38 @@
       "bases:Create new base": false
     }
   },
-  "active": "d0d3ddee08b358f3",
+  "active": "7e721ee150e5acf9",
   "lastOpenFiles": [
-    "Welcome.md"
+    "src/watcher/__pycache__/lock_manager.cpython-312.pyc",
+    "src/watcher/__pycache__/file_mover.cpython-312.pyc",
+    "src/watcher/__pycache__/config.cpython-312.pyc",
+    "src/watcher/__pycache__/__init__.cpython-312.pyc",
+    "src/watcher/__pycache__",
+    "Needs_Action/task-002.md",
+    "Untitled.md",
+    "Needs_Action/task-001.md",
+    "README.md",
+    "Welcome.md",
+    "Dashboard.md",
+    "history/prompts/001-bronze-tier/004-implement-bronze-tier-system.green.prompt.md",
+    "scripts/start-watcher.ps1",
+    "src/watcher/watcher.py",
+    "specs/001-bronze-tier/contracts/cli-commands.md",
+    "src/watcher/lock_manager.py",
+    "src/watcher/file_mover.py",
+    "src/watcher/config.py",
+    "src/watcher/__init__.py",
+    "Company_Handbook.md",
+    "history/prompts/001-bronze-tier/003-generate-bronze-tier-tasks.tasks.prompt.md",
+    "specs/001-bronze-tier/tasks.md",
+    "history/prompts/001-bronze-tier/002-create-bronze-tier-plan.plan.prompt.md",
+    "specs/001-bronze-tier/quickstart.md",
+    "specs/001-bronze-tier/data-model.md",
+    "specs/001-bronze-tier/research.md",
+    "specs/001-bronze-tier/plan.md",
+    "history/prompts/001-bronze-tier/001-create-bronze-tier-spec.spec.prompt.md",
+    "specs/001-bronze-tier/checklists/requirements.md",
+    "specs/001-bronze-tier/spec.md",
+    "history/prompts/constitution/001-enable-bronze-tier-capabilities.constitution.prompt.md"
   ]
 }
