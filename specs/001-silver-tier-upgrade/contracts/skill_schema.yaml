@@ -1,0 +1,270 @@
+# Agent Skill File Format Specification
+# Silver Tier Upgrade - Agent Skill Schema
+
+schema_version: "1.0.0"
+description: "Defines the structure and validation rules for Agent Skill files stored in /Skills folder"
+
+frontmatter:
+  type: object
+  required:
+    - skill_name
+    - description
+    - version
+    - required_permissions
+    - requires_approval
+
+  properties:
+    skill_name:
+      type: string
+      pattern: '^[a-z_]+$'
+      description: "Unique skill identifier (lowercase with underscores)"
+      examples:
+        - "planner_skill"
+        - "email_skill"
+        - "facebook_skill"
+
+    description:
+      type: string
+      minLength: 10
+      maxLength: 500
+      description: "Human-readable skill purpose"
+      examples:
+        - "Generates structured execution plans from task descriptions and routes them based on action types"
+
+    version:
+      type: string
+      pattern: '^\d+\.\d+\.\d+$'
+      description: "Semantic version (MAJOR.MINOR.PATCH)"
+      examples:
+        - "1.0.0"
+        - "1.2.3"
+
+    required_permissions:
+      type: array
+      minItems: 1
+      items:
+        type: string
+        enum:
+          - file_read
+          - file_write
+          - file_move
+          - file_delete
+          - mcp_email
+          - mcp_facebook
+      description: "Permissions needed to execute this skill"
+      examples:
+        - ["file_read", "file_write"]
+        - ["file_read", "mcp_email"]
+
+    external_dependencies:
+      type: array
+      items:
+        type: string
+      description: "External services or systems required"
+      examples:
+        - ["mcp_server"]
+        - ["gmail_imap", "mcp_server"]
+      default: []
+
+    requires_approval:
+      type: boolean
+      description: "True if skill performs external actions requiring human approval"
+      validation: "MUST be true if required_permissions includes 'mcp_*' permissions"
+      examples:
+        - true
+        - false
+
+    error_handling:
+      type: object
+      required:
+        - retry_strategy
+        - max_retries
+        - fallback_action
+      properties:
+        retry_strategy:
+          type: string
+          enum:
+            - none
+            - exponential_backoff
+            - circuit_breaker
+          description: "Error recovery strategy"
+          default: "none"
+
+        max_retries:
+          type: integer
+          minimum: 0
+          maximum: 5
+          description: "Maximum retry attempts before failing"
+          default: 0
+
+        fallback_action:
+          type: string
+          description: "What to do if all retries fail"
+          examples:
+            - "Log error and move task back to Needs_Action"
+            - "Move plan to Pending_Approval with error details"
+
+    rollback_procedure:
+      type: string
+      minLength: 10
+      maxLength: 2000
+      description: "How to undo skill execution if it fails"
+      examples:
+        - "Delete generated plan file and restore task to original state"
+
+content_body:
+  type: markdown
+  required_sections:
+    - execution_logic
+    - input_format
+    - output_format
+
+  optional_sections:
+    - examples
+    - edge_cases
+
+  sections:
+    execution_logic:
+      description: "Detailed step-by-step skill implementation instructions"
+      format: "Numbered list or prose with code blocks"
+
+      example: |
+        ## Execution Logic
+
+        1. Read task file from Needs_Action folder
+        2. Parse task content and extract requirements
+        3. Determine required actions (file operations vs external actions)
+        4. Generate structured plan with steps, risks, and rollback procedure
+        5. Set requires_approval flag based on action types
+        6. Route plan to appropriate folder (Plans or Pending_Approval)
+        7. Log plan generation in execution log
+
+    input_format:
+      description: "Expected input structure and validation rules"
+      format: "YAML or JSON schema with examples"
+
+      example: |
+        ## Input Format
+
+        **Task File** (Markdown with YAML frontmatter):
+        ```yaml
+        ---
+        id: "20260215-143000-task-slug"
+        title: "Task description"
+        status: "triaged"
+        priority: "P2"
+        ---
+
+        # Task content
+        Detailed task description and requirements...
+        ```
+
+    output_format:
+      description: "Generated output structure and location"
+      format: "YAML or JSON schema with examples"
+
+      example: |
+        ## Output Format
+
+        **Plan File** (Markdown with YAML frontmatter):
+        ```yaml
+        ---
+        id: "20260215-143000-task-slug"
+        task_id: "20260215-143000-task-slug"
+        objective: "Clear objective statement"
+        requires_approval: true
+        created_at: "2026-02-15T14:35:00Z"
+        execution_status: "pending"
+        ---
+
+        # Execution Plan: [Title]
+
+        ## Steps
+        [Ordered execution steps...]
+
+        ## Risks
+        [Potential failure modes...]
+
+        ## Rollback Procedure
+        [Undo steps...]
+        ```
+
+    examples:
+      description: "Example inputs and expected outputs"
+      format: "Multiple examples showing different scenarios"
+
+      example: |
+        ## Examples
+
+        ### Example 1: File-only task
+        **Input**: Task requesting file organization
+        **Output**: Plan routed to /Plans with file_move actions
+
+        ### Example 2: Email task
+        **Input**: Task requesting email sending
+        **Output**: Plan routed to /Pending_Approval with send_email action
+
+    edge_cases:
+      description: "Unusual scenarios and how to handle them"
+      format: "Bulleted list with handling instructions"
+
+      example: |
+        ## Edge Cases
+
+        - **Empty task content**: Log error, move task back to Inbox
+        - **Malformed YAML frontmatter**: Attempt to repair, or flag for human review
+        - **Ambiguous action type**: Default to requires_approval=true for safety
+
+predefined_skills:
+  - skill_name: "planner_skill"
+    description: "Generates execution plans from tasks and routes them based on action types"
+    required_permissions:
+      - file_read
+      - file_write
+      - file_move
+    requires_approval: false
+    error_handling:
+      retry_strategy: "none"
+      max_retries: 0
+      fallback_action: "Log error and move task back to Needs_Action with error details"
+
+  - skill_name: "email_skill"
+    description: "Composes and sends emails via MCP server with approval workflow"
+    required_permissions:
+      - file_read
+      - mcp_email
+    requires_approval: true
+    error_handling:
+      retry_strategy: "exponential_backoff"
+      max_retries: 3
+      fallback_action: "Move plan back to Pending_Approval with error message and retry instructions"
+
+  - skill_name: "facebook_skill"
+    description: "Composes and posts to Facebook Pages via MCP server with approval workflow"
+    required_permissions:
+      - file_read
+      - mcp_facebook
+    requires_approval: true
+    error_handling:
+      retry_strategy: "circuit_breaker"
+      max_retries: 3
+      fallback_action: "Move plan back to Pending_Approval with error message and retry instructions"
+
+validation_rules:
+  - rule: "skill_name MUST be unique across all skills in /Skills folder"
+  - rule: "If required_permissions includes 'mcp_*', requires_approval MUST be true"
+  - rule: "version MUST follow semantic versioning (MAJOR.MINOR.PATCH)"
+  - rule: "error_handling.max_retries MUST be 0-5"
+  - rule: "rollback_procedure MUST be non-empty if requires_approval is true"
+  - rule: "execution_logic section MUST be present in content body"
+
+file_naming:
+  pattern: "{skill_name}.md"
+  examples:
+    - "planner_skill.md"
+    - "email_skill.md"
+    - "facebook_skill.md"
+
+file_location:
+  path: "/Skills"
+  description: "All agent skills stored in /Skills folder at vault root"

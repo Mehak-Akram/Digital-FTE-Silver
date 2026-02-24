@@ -58,11 +58,20 @@ Inbox/*.md
 Needs_Action/*.md
 Plans/*.md
 Done/*.md
+Pending_Approval/*.md
+Approved/*.md
+Rejected/*.md
 .watcher/watcher.lock
 .watcher/watcher.log
+
+# MCP Server logs
+mcp_server/logs/*.log
 
 # Keep folder structure
 !Inbox/.gitkeep
 !Needs_Action/.gitkeep
 !Plans/.gitkeep
 !Done/.gitkeep
+!Pending_Approval/.gitkeep
+!Approved/.gitkeep
+!Rejected/.gitkeep

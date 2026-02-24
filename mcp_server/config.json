@@ -1,0 +1,32 @@
+{
+  "server_name": "silver_tier_mcp",
+  "version": "1.0.0",
+  "enabled_functions": ["send_email", "post_facebook_page"],
+  "email_config": {
+    "smtp_host": "${SMTP_HOST}",
+    "smtp_port": "${SMTP_PORT}",
+    "smtp_use_tls": "${SMTP_USE_TLS}",
+    "from_address": "${EMAIL_ADDRESS}",
+    "credentials_env_var": "EMAIL_PASSWORD"
+  },
+  "facebook_config": {
+    "api_version": "v18.0",
+    "page_id_env_var": "${FACEBOOK_PAGE_ID}",
+    "access_token_env_var": "${FACEBOOK_PAGE_ACCESS_TOKEN}"
+  },
+  "rate_limits": {
+    "email_per_hour": 50,
+    "facebook_per_hour": 25
+  },
+  "logging": {
+    "log_level": "${LOG_LEVEL}",
+    "log_file_path": "mcp_server/logs/mcp-server-{date}.log",
+    "log_retention_days": "${LOG_RETENTION_DAYS}"
+  },
+  "circuit_breaker": {
+    "enabled": true,
+    "failure_threshold": 5,
+    "timeout_seconds": 60,
+    "half_open_max_requests": 1
+  }
+}
